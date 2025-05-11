@@ -51,10 +51,10 @@ use function is_float;
 use function is_int;
 use function is_string;
 use function min;
-use function serialize;
+use function igbinary_serialize;
 use function sleep;
 use function strtotime;
-use function unserialize;
+use function igbinary_unserialize;
 use const PHP_INT_MAX;
 
 class MysqliThread extends SqlSlaveThread{
@@ -70,7 +70,7 @@ class MysqliThread extends SqlSlaveThread{
 	}
 
 	public function __construct(MysqlCredentials $credentials, SleeperHandlerEntry $entry, AttachableThreadSafeLogger $logger, QuerySendQueue $bufferSend = null, QueryRecvQueue $bufferRecv = null){
-		$this->credentials = serialize($credentials);
+		$this->credentials = igbinary_serialize($credentials);
 		$this->logger = $logger;
 
 		parent::__construct($entry, $bufferSend, $bufferRecv);
@@ -78,7 +78,7 @@ class MysqliThread extends SqlSlaveThread{
 
 	protected function createConn(&$mysqli) : ?string{
 		/** @var MysqlCredentials $cred */
-		$cred = unserialize($this->credentials);
+		$cred = igbinary_unserialize($this->credentials);
 		try{
 			$mysqli = $cred->newMysqli();
 
@@ -105,7 +105,7 @@ class MysqliThread extends SqlSlaveThread{
 	protected function executeQuery($mysqli, int $mode, string $query, array $params) : SqlResult{
 		assert($mysqli instanceof mysqli);
 		/** @var MysqlCredentials $cred */
-		$cred = unserialize($this->credentials);
+		$cred = igbinary_unserialize($this->credentials);
 		$ping = false;
 
 		mysqli_report(MYSQLI_REPORT_OFF);
