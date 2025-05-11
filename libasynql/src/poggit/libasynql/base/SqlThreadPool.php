@@ -113,8 +113,11 @@ class SqlThreadPool implements SqlThread{
 				throw new InvalidArgumentException("Missing handler for query #$queryId");
 			}
 
-			$callbacks[$queryId]($results);
-			unset($callbacks[$queryId]);
+			try{
+				$callbacks[$queryId]($results);
+			}finally{
+				unset($callbacks[$queryId]);
+			}
 		}
 	}
 
