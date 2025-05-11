@@ -31,7 +31,6 @@ use function igbinary_serialize;
 use function igbinary_unserialize;
 
 class QueryRecvQueue extends ThreadSafe{
-	private int $availableThreads = 0;
 
 	private ThreadSafeArray $queue;
 
@@ -57,8 +56,8 @@ class QueryRecvQueue extends ThreadSafe{
 	}
 
 	public function fetchResults(&$queryId, &$results) : bool{
-		while($this->count() > 0){
-			$row = $this->shift();
+		while($this->queue->count() > 0){
+			$row = $this->queue->shift();
 			if(is_string($row)){
 				[$queryId, $results] = igbinary_unserialize($row, ["allowed_classes" => true]);
 				return true;
