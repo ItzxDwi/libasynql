@@ -27,8 +27,8 @@ use pmmp\thread\ThreadSafeArray;
 use poggit\libasynql\SqlError;
 use poggit\libasynql\SqlResult;
 use function is_string;
-use function serialize;
-use function unserialize;
+use function igbinary_serialize;
+use function igbinary_unserialize;
 
 class QueryRecvQueue extends ThreadSafe{
 	private int $availableThreads = 0;
@@ -44,14 +44,14 @@ class QueryRecvQueue extends ThreadSafe{
 	 */
 	public function publishResult(int $queryId, array $results) : void{
 		$this->synchronized(function() use ($queryId, $results) : void{
-			$this->queue[] = serialize([$queryId, $results]);
+			$this->queue[] = igbinary_serialize([$queryId, $results]);
 			$this->notify();
 		});
 	}
 
 	public function publishError(int $queryId, SqlError $error) : void{
 		$this->synchronized(function() use ($error, $queryId) : void{
-			$this->queue[] = serialize([$queryId, $error]);
+			$this->queue[] = igbinary_serialize([$queryId, $error]);
 			$this->notify();
 		});
 	}
@@ -59,7 +59,7 @@ class QueryRecvQueue extends ThreadSafe{
 	public function fetchResults(&$queryId, &$results) : bool{
 		$row = $this->queue->shift();
 		if(is_string($row)){
-			[$queryId, $results] = unserialize($row, ["allowed_classes" => true]);
+			[$queryId, $results] = igbinary_unserialize($row, ["allowed_classes" => true]);
 			return true;
 		}
 		return false;
