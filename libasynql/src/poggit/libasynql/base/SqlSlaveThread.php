@@ -78,7 +78,7 @@ abstract class SqlSlaveThread extends Thread implements SqlThread{
 				break;
 			}
 			$this->busy = true;
-			[$queryId, $modes, $queries, $params] = unserialize($row, ["allowed_classes" => true]);
+			[$queryId, $modes, $queries, $params] = igbinary_unserialize($row, ["allowed_classes" => true]);
 
 			try{
 				$results = [];
