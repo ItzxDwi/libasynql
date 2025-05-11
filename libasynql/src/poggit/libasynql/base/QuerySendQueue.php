@@ -24,7 +24,7 @@ namespace poggit\libasynql\base;
 
 use pmmp\thread\ThreadSafe;
 use pmmp\thread\ThreadSafeArray;
-use function serialize;
+use function igbinary_serialize;
 
 class QuerySendQueue extends ThreadSafe{
 	/** @var bool */
@@ -41,7 +41,7 @@ class QuerySendQueue extends ThreadSafe{
 			throw new QueueShutdownException("You cannot schedule a query on an invalidated queue.");
 		}
 		$this->synchronized(function() use ($queryId, $modes, $queries, $params) : void{
-			$this->queries[] = serialize([$queryId, $modes, $queries, $params]);
+			$this->queries[] = igbinary_serialize([$queryId, $modes, $queries, $params]);
 			$this->notifyOne();
 		});
 	}
