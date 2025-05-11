@@ -57,10 +57,12 @@ class QueryRecvQueue extends ThreadSafe{
 	}
 
 	public function fetchResults(&$queryId, &$results) : bool{
-		$row = $this->queue->shift();
-		if(is_string($row)){
-			[$queryId, $results] = igbinary_unserialize($row, ["allowed_classes" => true]);
-			return true;
+		while($this->count() > 0){
+			$row = $this->shift();
+			if(is_string($row)){
+				[$queryId, $results] = igbinary_unserialize($row, ["allowed_classes" => true]);
+				return true;
+			}
 		}
 		return false;
 	}
